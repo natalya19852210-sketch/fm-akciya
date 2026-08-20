@@ -93,7 +93,7 @@ function updline(){
     +'</b> · следующее в '+next+'</div>';
 }
 function history(){
-  var H=D.history||[]; if(H.length<2){return ''}
+  var H=D.history||[]; if(!H.length){return ''}
   var h='<div class="hist"><div class="hl">кошелёк по часам</div><div class="hrow">';
   var from=Math.max(0,H.length-10);
   for(var i=from;i<H.length;i++){
