@@ -48,6 +48,22 @@ font-variant-numeric:tabular-nums}
 .rules{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:14px 15px;margin-top:18px;font-size:13px;line-height:1.6}
 .rules b{color:var(--accent)}
 .foot{text-align:center;font-size:11px;color:var(--muted);margin-top:18px}
+.upd{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;font-size:12px;
+color:var(--muted)}
+.upd .dot{width:8px;height:8px;border-radius:50%;background:var(--good);flex:none;
+box-shadow:0 0 0 0 rgba(23,122,58,.55);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(23,122,58,.5)}70%{box-shadow:0 0 0 9px rgba(23,122,58,0)}
+100%{box-shadow:0 0 0 0 rgba(23,122,58,0)}}
+.upd b{color:var(--ink);font-weight:650}
+.hist{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.hist .hl{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;
+text-align:center;margin-bottom:8px}
+.hrow{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;justify-content:flex-start}
+.hrow::-webkit-scrollbar{height:0}
+.hp{flex:none;background:var(--surface2);border-radius:9px;padding:6px 9px;text-align:center;min-width:62px}
+.hp .ht{font-size:10px;color:var(--muted);display:block}
+.hp .hv{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.hp.now{background:var(--chip)}.hp.now .hv{color:var(--accent)}
 .empty{text-align:center;color:var(--muted);padding:34px 18px;font-size:14px;line-height:1.55}
 </style></head><body>
 <div class="wrap">
@@ -70,6 +86,23 @@ function sizes(r){
   for(var i=0;i<r.z.length;i++){h+='<b>'+esc(r.z[i][0])+' <i>'+nf(r.z[i][1])+'</i></b>'}
   return h+'</div>';
 }
+function updline(){
+  var next=D.gen.slice(-5).split(':')[0];
+  next=(parseInt(next,10)+1)%24; next=(next<10?'0':'')+next+':00';
+  return '<div class="upd"><span class="dot"></span>обновлено в <b>'+D.gen.slice(-5)
+    +'</b> · следующее в '+next+'</div>';
+}
+function history(){
+  var H=D.history||[]; if(H.length<2){return ''}
+  var h='<div class="hist"><div class="hl">кошелёк по часам</div><div class="hrow">';
+  var from=Math.max(0,H.length-10);
+  for(var i=from;i<H.length;i++){
+    var p=H[i], v=(p.b&&p.b[CUR]!==undefined)?p.b[CUR]:0;
+    h+='<div class="hp'+(i===H.length-1?' now':'')+'"><span class="ht">'+esc(p.t.slice(-5))
+      +'</span><span class="hv">'+nf(v)+'</span></div>';
+  }
+  return h+'</div></div>';
+}
 function draw(){
   var s=D.stores[CUR]||{rows:[],stock:0,sold:0,rev:0,bonus:0,potential:0};
   var pct=s.potential?Math.min(100,Math.round(s.bonus/s.potential*100)):0;
@@ -78,7 +111,8 @@ function draw(){
    +'<div class="big">'+nf(s.bonus)+' &#8376;</div>'
    +'<div class="note">'+(D.started?'из '+nf(s.potential)+' &#8376; — если продать весь остаток':'старт '+D.start+' · можно заработать до '+nf(s.potential)+' &#8376;')+'</div>'
    +'<div class="bar"><i style="width:'+pct+'%"></i></div>'
-   +'<div class="note">'+pct+'% от возможного</div></div>'
+   +'<div class="note">'+pct+'% от возможного</div>'
+   +updline()+history()+'</div>'
    +'<div class="kpis">'
    +'<div class="k"><span class="l">продано, шт</span><span class="v">'+nf(s.sold)+'</span></div>'
    +'<div class="k"><span class="l">на сумму</span><span class="v">'+nf(s.rev)+'</span></div>'
